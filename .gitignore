@@ -1,0 +1,21 @@
+# Object files
+*.o
+
+# Executables
+uart_app
+*.out
+*.exe
+
+# Build folders (if any)
+build/
+bin/
+
+# Temporary files
+*.log
+*.tmp
+
+# Editor files
+*~
+*.swp
+.vscode/
+.idea/
