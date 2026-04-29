@@ -1,12 +1,22 @@
+/**
+ * @file uart.c
+ * @brief UART driver-style implementation using termios
+ */
+
+
 #include "headers.h"
 #include "declarations.h"
 #include "uart_operations.h"
 
 /* ================= IMPLEMENTATIONS ================= */
 
+
 /**
  * @brief Convert integer baudrate to termios constant
+ * @param baud Baud rate (e.g., 9600, 115200)
+ * @return Corresponding termios speed_t value
  */
+
 static speed_t get_baud(int baud)
 {
     switch (baud) {
@@ -19,6 +29,13 @@ static speed_t get_baud(int baud)
     }
 }
 
+
+/**
+ * @brief Open UART device
+ * @param dev Pointer to UART device structure
+ * @param device Device path
+ * @return 0 on success, -1 on failure
+ */
 static int uart_open_impl(uart_dev_t *dev, const char *device)
 {
     strncpy(dev->device, device, sizeof(dev->device));
@@ -29,10 +46,17 @@ static int uart_open_impl(uart_dev_t *dev, const char *device)
         return -1;
     }
 
-    fcntl(dev->fd, F_SETFL, 0);
-    return 0;
+   // fcntl(dev->fd, F_SETFL, 0);
+   fcntl(dev->fd, F_SETFL, O_NONBLOCK);
+   return 0;
 }
 
+
+/**
+ * @brief Initialize UART using termios
+ * @param dev UART device structure
+ * @return 0 on success, -1 on failure
+ */
 static int uart_init_impl(uart_dev_t *dev)
 {
     struct termios options;
@@ -41,8 +65,9 @@ static int uart_init_impl(uart_dev_t *dev)
         perror("tcgetattr failed");
         return -1;
     }
-
-    tcflush(dev->fd, TCIFLUSH);
+    // Set raw mode: no echo, no backspace processing, no signal chars
+    cfmakeraw(&options);
+ //   tcflush(dev->fd, TCIFLUSH);
 
     options.c_cflag &= ~CRTSCTS;
     options.c_cflag |= (CLOCAL | CREAD);
@@ -57,8 +82,9 @@ static int uart_init_impl(uart_dev_t *dev)
     options.c_cflag &= ~PARENB;
     options.c_cflag &= ~CSTOPB;
 
-    options.c_cc[VTIME] = 5;
+    options.c_cc[VTIME] = 10;
     options.c_cc[VMIN]  = 0;
+    options.c_cflag &= ~HUPCL; // Disable hang-up on last close (prevents reset)
 
     speed_t sp = get_baud(dev->baudrate);
 
@@ -73,6 +99,12 @@ static int uart_init_impl(uart_dev_t *dev)
     return 0;
 }
 
+/**
+ * @brief Write message to UART
+ * @param dev UART device
+ * @param msg Message string
+ * @return Number of bytes written or -1
+ */
 static int uart_write_impl(uart_dev_t *dev, const char *msg)
 {
     int n = write(dev->fd, msg, strlen(msg));
@@ -83,55 +115,79 @@ static int uart_write_impl(uart_dev_t *dev, const char *msg)
     return n;
 }
 
+/**
+ * @brief Read UART response (line-based)
+ * @param fd File descriptor
+ * @return 0
+ */
 static int uart_read_response(int fd)
 {
     char buf[256];
-    int n;
     int total_lines = 0;
+    struct pollfd fds[1];
+    
+    fds[0].fd = fd;
+    fds[0].events = POLLIN;
 
     printf("RX:\n");
 
-    while (total_lines < 2)
-    {
-        int pos = 0;
+    // We only expect 1 line now ("hello from arduino!!")
+    while (total_lines < 1) {
+        // Wait for 2000ms (2 seconds) - This is the "Non-blocking" timeout
+        int ret = poll(fds, 1, 2000);
 
-        while (pos < sizeof(buf) - 1) {
-            n = read(fd, &buf[pos], 1);
+        if (ret < 0) {
+            perror("poll error");
+            return -1;
+        } else if (ret == 0) {
+            printf("[TIMEOUT]: No response from Arduino.\n");
+            return -1; // Exit instead of hanging
+        }
 
-            if (n > 0) {
-                if (buf[pos] == '\n') {
-                    pos++;
-                    break;
+        // Data is ready to be read
+        if (fds[0].revents & POLLIN) {
+            unsigned long pos = 0;
+            while (pos < sizeof(buf) - 1) {
+                char c;
+                // Read one byte at a time
+                if (read(fd, &c, 1) > 0) {
+                    buf[pos++] = c;
+                    if (c == '\n') break;
                 }
-                pos++;
-            } else {
-                usleep(10000);
+            }
+            buf[pos] = '\0';
+            if (pos > 0) {
+                printf("%s", buf);
+                total_lines++;
             }
         }
-
-        buf[pos] = '\0';
-
-        if (pos > 0) {
-            printf("%s", buf);
-            total_lines++;
-        }
     }
-
     return 0;
 }
 
+
+
+/**
+ * @brief Read from UART
+ * @param dev UART device
+ * @return 0
+ */
 static int uart_read_impl(uart_dev_t *dev)
 {
     return uart_read_response(dev->fd);
 }
 
+/**
+ * @brief Close UART device
+ * @param dev UART device
+ */
 static void uart_close_impl(uart_dev_t *dev)
 {
     close(dev->fd);
 }
 
 /* ================= OPS DEFINITION ================= */
-
+/** UART operations instance */
 uart_ops_t uart_ops = {
     .open  = uart_open_impl,
     .init  = uart_init_impl,
