@@ -1,3 +1,10 @@
+/**
+ * @file headers.h
+ * @brief Common system headers for UART application
+ * @author Raghu
+ */
+
+
 #ifndef HEADERS_H
 #define HEADERS_H
 
@@ -9,5 +16,6 @@
 #include <errno.h>
 #include <termios.h>
 #include <sys/select.h>
+#include <poll.h>
 
 #endif

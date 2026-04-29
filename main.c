@@ -1,3 +1,8 @@
+/**
+ * @file main.c
+ * @brief UART CLI application
+ */
+
 #include "headers.h"
 #include "declarations.h"
 #include "uart_operations.h"
@@ -20,8 +25,12 @@ void usage(const char *prog)
     printf("Example:\n");
     printf("  %s -d /dev/ttyACM0 -s 9600 \"test\"\n\n", prog);
 }
+
 /**
- * @brief Main entry
+ * @brief Main entry point
+ * @param argc Argument count
+ * @param argv Argument vector
+ * @return 0 on success
  */
 int main(int argc, char *argv[])
 {
@@ -84,7 +93,7 @@ int main(int argc, char *argv[])
         return -1;
 
     sleep(2);
-    tcflush(dev.fd, TCIOFLUSH); /* Send message */
+    tcflush(dev.fd, TCIOFLUSH); /* flush it */
     char txbuf[256];
     snprintf(txbuf, sizeof(txbuf), "%s\n", message);
 
