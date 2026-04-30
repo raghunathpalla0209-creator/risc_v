@@ -8,13 +8,12 @@ UART communication via CLI
 Configurable device and baud rate
 Send and receive messages
 Debug logging support
-Works with devices like Arduino
+Works with any device which has UART access
+
+# test
+for testing I am using arduno  which sends message to  /dev/ttyACM0
 
 # Help Command
-
-# make -> build the code 
-
-# execution 
 ./uart_app --help
 Output
 UART CLI Tool
@@ -29,8 +28,10 @@ Options:
 Example:
   ./uart_app -d /dev/ttyACM0 -s 9600 "test"
 
+# make -> build the code 
+make
 
-
+# execution 
 ./uart_app -d /dev/ttyACM0 -s 9600 "test"
 
 Device : /dev/ttyACM0
