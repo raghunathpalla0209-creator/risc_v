@@ -16,6 +16,10 @@
 #include "declarations.h"
 #include "uart_operations.h"
 
+#define TIME_OF_SECONDS   10
+#define BUFFER_SIZE       256
+#define WAIT_IN_MS        2000
+
 /* ================= IMPLEMENTATIONS ================= */
 
 
@@ -90,7 +94,7 @@ static int uart_init_impl(uart_dev_t *dev)
     options.c_cflag &= ~PARENB;
     options.c_cflag &= ~CSTOPB;
 
-    options.c_cc[VTIME] = 10;
+    options.c_cc[VTIME] = TIME_OF_SECONDS;
     options.c_cc[VMIN]  = 0;
     options.c_cflag &= ~HUPCL; // Disable hang-up on last close (prevents reset)
 
@@ -130,7 +134,7 @@ static int uart_write_impl(uart_dev_t *dev, const char *msg)
  */
 static int uart_read_response(int fd)
 {
-    char buf[256];
+    char buf[BUFFER_SIZE];
     int total_lines = 0;
     struct pollfd fds[1];
     
@@ -142,7 +146,7 @@ static int uart_read_response(int fd)
     // We only expect 1 line now ("hello from arduino!!")
     while (total_lines < 1) {
         // Wait for 2000ms (2 seconds) - This is the "Non-blocking" timeout
-        int ret = poll(fds, 1, 2000);
+        int ret = poll(fds, 1, WAIT_IN_MS);
 
         if (ret < 0) {
             perror("poll error");
