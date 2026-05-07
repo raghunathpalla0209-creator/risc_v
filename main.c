@@ -21,6 +21,9 @@
 #include "uart_operations.h"
 #include <getopt.h>
 
+#define TX_BUFFER_SIZE      256
+#define DEFAULT_BAUD        9600
+
 /**
  * @brief Print usage/help
  * For help
@@ -50,7 +53,7 @@ int main(int argc, char *argv[])
 {
     uart_dev_t dev;
     int opt;
-    int baud = 9600;
+    int baud = DEFAULT_BAUD;
     char *device = NULL;
     char *message = NULL;
 
@@ -108,7 +111,7 @@ int main(int argc, char *argv[])
 
     sleep(2);
     tcflush(dev.fd, TCIOFLUSH); /* flush it */
-    char txbuf[256];
+    char txbuf[TX_BUFFER_SIZE];
     snprintf(txbuf, sizeof(txbuf), "%s\n", message);
 
     uart_ops.write(&dev, txbuf);
