@@ -1,7 +1,16 @@
 /**
  * @file headers.h
- * @brief Common system headers for UART application
- * @author Raghu
+ * @author Raghunath Palla
+ * @date 2026-04-29
+ * @brief Include all system Libraries
+ *
+ * @details
+ * This header file contains all standard library includes
+ * required across the UART application modules.
+ * 
+ * This software is released under the MIT License.
+ * Permission is hereby granted to use, copy, modify, and distribute
+ * this software for any purpose with or without fee.
  */
 
 

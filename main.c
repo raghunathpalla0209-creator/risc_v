@@ -1,7 +1,20 @@
 /**
  * @file main.c
- * @brief UART CLI application
+ * @author Raghunath Palla
+ * @date 2026-04-29
+ * @brief main file, entry point
+ *
+ * @details
+ * This file contains the main entry point for the UART
+ * application. It parses command-line arguments, initializes
+ * the UART device, sends user commands, and prints responses.
+ * 
+ * This software is released under the MIT License.
+ * Permission is hereby granted to use, copy, modify, and distribute
+ * this software for any purpose with or without fee.
  */
+
+/* ============ Defines =========== */
 
 #include "headers.h"
 #include "declarations.h"
@@ -10,6 +23,7 @@
 
 /**
  * @brief Print usage/help
+ * For help
  */
 void usage(const char *prog)
 {

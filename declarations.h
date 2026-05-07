@@ -1,9 +1,16 @@
-
 /**
  * @file declarations.h
+ * @author Raghunath Palla
+ * @date 2026-04-29
  * @brief UART device structure definitions
+ *
+ * @details
+ * Defines structures used to represent UART device state
+ * and configuration parameters.
+ *
+ * Distributed under the MIT License.
+ * Free to distribute , copy, read, write
  */
-
 
 #ifndef DECLARATIONS_H
 #define DECLARATIONS_H

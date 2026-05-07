@@ -1,6 +1,13 @@
 /**
  * @file uart_operations.h
- * @brief UART operations interface (driver-style abstraction)
+ * @author Raghunath Palla
+ * @date 2026-05-29
+ * @brief UART operations interface
+ *
+ * @details
+ * Defines driver-style UART operations using function pointers,
+ *
+ * Distributed under the MIT License.
  */
 
 #ifndef UART_OPERATIONS_H

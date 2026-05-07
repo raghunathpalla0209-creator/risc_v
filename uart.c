@@ -1,6 +1,14 @@
 /**
  * @file uart.c
- * @brief UART driver-style implementation using termios
+ * @author Raghunath Palla
+ * @date 2026-04-29
+ * @brief UART implementation using termios API
+ *
+ * @details
+ * Implements UART open, configuration, read, write, and close
+ * operations using Linux system calls and termios interface.
+ *
+ * Distributed under the MIT License.
  */
 
 
